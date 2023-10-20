@@ -1,0 +1,67 @@
+version: '3.1'
+
+services:
+  react-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./build:/app/build
+
+  nginx:
+    restart: always
+    image: nginx:latest
+    volumes:
+      - ./build:/usr/share/nginx/html
+      - ./:/etc/nginx/conf.d/
+    ports:
+      - "80:80"
+    depends_on:
+      - react-builder
+      - backend
+    networks:
+      - backlink
+      
+
+  mysql:
+    restart: always
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: dockerdata
+      MYSQL_USER: udocker
+      MYSQL_PASSWORD: dockerpassword
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    networks:
+      - bddlink
+
+
+
+  backend:
+    restart: always
+    build:
+      context: ./backend
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_USER: udocker
+      DATABASE_PASSWORD: dockerpassword
+      DATABASE_NAME: mydatabase
+    depends_on:
+      - mysql
+    # ports:
+    # - "3000:3000"
+    networks:
+      - backlink
+      - bddlink
+
+
+
+volumes:
+  mysql-data:
+
+networks:
+  bddlink:
+   
+  backlink:
+
