@@ -1,19 +1,27 @@
+import React, { useEffect } from 'react';
 // local dependencies
-import Rule from "../Rule/Rule";
+import Rule from '../Rule/Rule';
 
 /**
  * Display list of rules.
  */
 function RuleList({ rules, setRules }) {
+  useEffect(() => {
+    fetch('http://localhost:3000/api/rules')
+      .then((response) => response.json())
+      .then((data) => {
+        setRules(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching rules:', error);
+      });
+  }, []);
+
   const deleteRule = (index) => {
     const newRules = [...rules];
     newRules.splice(index, 1);
     setRules(newRules);
   };
-
-  // useEffect(() => {
-  //   alert('Rules list updated');
-  // }, [rules]);
 
   return (
     rules &&
